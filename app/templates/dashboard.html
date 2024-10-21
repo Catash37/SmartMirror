@@ -24,6 +24,10 @@
         
         <p>Welcome, {{ username }}!</p>
         <p>You have successfully logged in.</p>
+
+        <p>Current Time in {{ time_zone}}: {{ current_time }}</p>
+        <a href="{{ url_for('main.logout') }}">Logout</a>
+
         
         <form action="{{ url_for('main.logout') }}" method="GET">
             <button type="submit" class="logout-button">Logout</button>
