@@ -11,6 +11,8 @@ from .utils import load_users, save_user, find_user_by_encoding
 import base64
 from io import BytesIO
 from PIL import Image
+from datetime import datetime
+import pytz
 
 main = Blueprint('main', __name__)
 UPLOAD_FOLDER = 'uploads/'
@@ -103,7 +105,11 @@ def dashboard():
         flash('Please log in first.', 'warning')
         return redirect(url_for('main.login'))
     username = session['username']
-    return render_template('dashboard.html', username=username)
+    user_time_zone = user.get('time_zone', 'UTC')  # Get user's time zone
+    timezone = pytz.timezone(user_time_zone)
+    current_time = datetime.now(timezone).strftime('%Y-%m-%d %H:%M:%S')  # Current time in user's time zone
+
+    return render_template('dashboard.html', username=username, timezone=user_time_zone, current_time=current_time)
 
 
 @main.route('/logout')
