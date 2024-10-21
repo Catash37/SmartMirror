@@ -12,4 +12,3 @@ Flask-Session
 google-auth
 google-auth-oauthlib
 requests
-dlib==19.22.0
