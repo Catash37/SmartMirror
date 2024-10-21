@@ -30,7 +30,8 @@ def register():
     if form.validate_on_submit():
         username = form.username.data
         face_image = form.face_image.data
-
+        time_zone = form.time_zone.data
+        
         if face_image and allowed_file(face_image.filename):
             filename = secure_filename(face_image.filename)
             file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
@@ -50,7 +51,8 @@ def register():
             user = {
                 'username': username,
                 'face_encoding': encoding,
-                'image_filename': filename
+                'image_filename': filename,
+                'time_zone': time_zone
             }
 
             save_user(user)
