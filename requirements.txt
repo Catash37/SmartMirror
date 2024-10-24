@@ -1,7 +1,7 @@
 Flask
 Flask-Login
 Flask-WTF
-face-recognition
+face_recognition
 gunicorn
 python-dotenv
 google-api-python-client
@@ -13,3 +13,4 @@ google-auth
 google-auth-oauthlib
 requests
 dlib
+path_to_downloaded_wheel.whl
