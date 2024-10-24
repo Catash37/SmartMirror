@@ -1,7 +1,6 @@
 Flask
 Flask-Login
 Flask-WTF
-face_recognition
 gunicorn
 python-dotenv
 google-api-python-client
@@ -12,4 +11,5 @@ Flask-Session
 google-auth
 google-auth-oauthlib
 requests
-dlib
+tensorflow
+opencv-python
