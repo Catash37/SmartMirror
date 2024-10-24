@@ -66,4 +66,4 @@ jobs:
         with:
           app-name: 'SmartMirror'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D0DA863BAAE04E0187E976E79C3AD992 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9ED48B82AB9F4242845095864122BA3F }}
