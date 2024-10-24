@@ -1,8 +1,5 @@
-# app/routes.py
-
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from werkzeug.utils import secure_filename
-import face_recognition
 import os
 import json
 import numpy as np
@@ -13,14 +10,32 @@ from io import BytesIO
 from PIL import Image
 from datetime import datetime
 import pytz
+import cv2  # Import OpenCV
+import tensorflow as tf  # Import TensorFlow
 
 main = Blueprint('main', __name__)
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 USERS_FILE = os.path.join(os.path.dirname(__file__), 'users.json')
 
+# Load FaceNet model
+model = tf.keras.models.load_model('path_to_facenets_model.h5')  # Update with your model path
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def preprocess_image(image):
+    """Preprocess the image for FaceNet."""
+    image = cv2.resize(image, (160, 160))  # Resize to 160x160
+    image = np.expand_dims(image, axis=0)  # Add batch dimension
+    image = (image / 255.0)  # Normalize to [0, 1]
+    return image
+
+def get_face_encoding(image_np):
+    """Get face encoding using FaceNet."""
+    processed_image = preprocess_image(image_np)
+    encoding = model.predict(processed_image)
+    return encoding.flatten().tolist()  # Flatten and convert to list for JSON serialization
 
 @main.route('/')
 def index():
@@ -40,10 +55,10 @@ def register():
             face_image.save(file_path)
 
             # Process face image
-            image = face_recognition.load_image_file(file_path)
-            encodings = face_recognition.face_encodings(image)
+            image = cv2.imread(file_path)
+            encodings = get_face_encoding(image)
             if encodings:
-                encoding = encodings[0].tolist()  # Convert numpy array to list for JSON serialization
+                encoding = encodings
             else:
                 flash('No face detected in the image.', 'danger')
                 os.remove(file_path)  # Remove the uploaded file if no face is detected
@@ -82,9 +97,9 @@ def login():
         image_np = np.array(image)
 
         # Process face image
-        encodings = face_recognition.face_encodings(image_np)
+        encodings = get_face_encoding(image_np)
         if encodings:
-            encoding = encodings[0]
+            encoding = encodings
         else:
             flash('No face detected in the image.', 'danger')
             return redirect(url_for('main.login'))
@@ -106,13 +121,13 @@ def dashboard():
     if 'username' not in session:
         flash('Please log in first.', 'warning')
         return redirect(url_for('main.login'))
+    
     username = session['username']
     user_time_zone = user.get('time_zone', 'UTC')  # Get user's time zone
     timezone = pytz.timezone(user_time_zone)
     current_time = datetime.now(timezone).strftime('%Y-%m-%d %H:%M:%S')  # Current time in user's time zone
 
     return render_template('dashboard.html', username=username, timezone=user_time_zone, current_time=current_time)
-
 
 @main.route('/logout')
 def logout():
